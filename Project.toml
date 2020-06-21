@@ -1,0 +1,24 @@
+name = "GridUtilities"
+uuid = "5c019650-0847-4ff6-8f91-f8ecfc8c3009"
+authors = ["Jeff Eldredge <jdeldre@g.ucla.edu>"]
+repo = "https://github.com/JuliaIBPM/GridUtilities.jl.git"
+version = "0.1.0"
+
+[deps]
+Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
+JLD = "4138dd39-2aa7-5051-a626-17a0bb65d9c8"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+
+[compat]
+Interpolations = "0.12.10"
+Reexport = "^0"
+julia = "1"
+
+[extras]
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "Random"]
