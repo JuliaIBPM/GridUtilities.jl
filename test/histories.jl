@@ -1,3 +1,5 @@
+using CartesianGrids
+
 @testset "Histories" begin
 
   a = 1.0
