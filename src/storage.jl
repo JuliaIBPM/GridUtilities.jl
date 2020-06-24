@@ -1,4 +1,4 @@
-using JLD
+@reexport using JLD
 import JLD: save, load
 
 export WritePlan,StorePlan, initialize_storage, store_data!
@@ -9,12 +9,13 @@ export WritePlan,StorePlan, initialize_storage, store_data!
 
 Create a plan for writing data to file. The filename `file` is specified,
 to be written to every `write_Δt` time units. The variable names to be written are
-specified as a vector of strings in `varlist`.
+specified as a set of dictionary pairs in `varlist`.
 """
 struct WritePlan
     filen::String
     write_Δt::Float64
-    varlist::Vector{String}
+    vardict::Dict
+    WritePlan(filen,write_Δt,varlist...) = new(filen,write_Δt,_get_typedict(varlist))
 end
 
 """
@@ -28,7 +29,7 @@ function save(t,R::WritePlan,v...)
     tol = 1e-8
     if (isapprox(mod(t,R.write_Δt),0,atol=tol) ||
         isapprox(mod(t,R.write_Δt),R.write_Δt,atol=tol))
-        save(R.filen,_writelist(R,v)...)
+        save(R.filen,_writelist(R,v...)...)
     end
 end
 
@@ -41,15 +42,16 @@ variable `var` is specified, outputs the specified variable.
 load(R::WritePlan) = load(R.filen)
 load(R::WritePlan,v...) = load(R.filen,v...)
 
-function _writelist(R::WritePlan,v)
+function _writelist(R::WritePlan,varlist...)
+    @assert length(R.vardict)==length(varlist)
     list = ()
-    @assert length(R.varlist)==length(v)
-    for (i,vname) in enumerate(R.varlist)
-        list = (list...,vname,v[i])
+    for v in varlist
+        @assert haskey(R.vardict,v.first) "No such variable exists in this list"
+        @assert typeof(v.second) == R.vardict[v.first] "Invalid type of data for this entry"
+        list = (list...,v.first,v.second)
     end
     return list
 end
-
 
 """
     StorePlan(min_t,max_t,store_Δt,v[;htype=RegularHistory])
@@ -67,13 +69,9 @@ struct StorePlan{H<:HistoryType}
     min_t::Float64
     max_t::Float64
     store_Δt::Float64
-    varlist::Vector{DataType}
-    StorePlan(min_t,max_t,store_Δt,varlist...;htype=RegularHistory) = new{htype}(min_t,max_t,store_Δt,_get_type(varlist))
+    vardict::Dict
+    StorePlan(min_t,max_t,store_Δt,varlist...;htype=RegularHistory) = new{htype}(min_t,max_t,store_Δt,_get_typedict(varlist))
 end
-
-#function StorePlan(min_t,max_t,store_Δt,v...)
-#    return StorePlan(min_t,max_t,store_Δt,_get_type(v))
-#end
 
 """
     initialize_storage(S::StorePlan) -> Vector
@@ -82,9 +80,9 @@ Initialize a storage data stack for the storage plan `S`. The output is
 an empty vector of `History` vectors.
 """
 function initialize_storage(S::StorePlan{H}) where {H}
-    data = []
-    for v in S.varlist
-        push!(data,History(v,htype=H))
+    data = Dict{String,History}()
+    for v in S.vardict
+        get!(data,v.first,History(v.second,htype=H))
     end
     return data
 end
@@ -94,48 +92,33 @@ end
     store_data!(data,t,S::StorePlan,v)
 
 Check whether time `t` is a time for saving for storage as described by plan `S`,
-and if so, push the variables specified in `v` onto the `data` stack.
+and if so, push the variables specified in `v` (a list of pairs) onto the `data` stack.
 """
 function store_data!(data,t,S::StorePlan,v...)
   tol = 1e-8
   if t >= (S.min_t-tol) && t <= (S.max_t + tol) &&
       ((isapprox(mod(t,S.store_Δt),0,atol=tol) ||
         isapprox(mod(t,S.store_Δt),S.store_Δt,atol=tol)))
-        store_data!(data,S::StorePlan,v)
+        _store_data!(data,S::StorePlan,v...)
   end
   return data
 end
 
 
-function _get_type(u)
-    tlist = DataType[]
-    _get_type!(tlist,u)
-    return tlist
-end
-function _get_type!(tlist,u::Tuple)
-    for ui in u
-        _get_type!(tlist,ui)
+function _get_typedict(varlist)
+    newdict = Dict{String,Type}()
+    for l in varlist
+        get!(newdict,l.first,typeof(l.second))
     end
-    return tlist
-end
-function _get_type!(tlist,u)
-    push!(tlist,typeof(u))
-    return tlist
+    return newdict
 end
 
-function store_data!(data,S::StorePlan,u)
-    cnt = [0]
-    return _store_data!(data,cnt,S,u)
-end
-function _store_data!(data,cnt,S::StorePlan,u::Tuple)
-    for ui in u
-        _store_data!(data,cnt,S,ui)
+
+function _store_data!(data,S::StorePlan,varlist...)
+    for v in varlist
+        @assert haskey(data,v.first) "No such variable exists in this list"
+        @assert typeof(v.second) == S.vardict[v.first] "Invalid type of data for this entry"
+        push!(data[v.first],v.second)
     end
-    return data
-end
-function _store_data!(data,cnt,S::StorePlan,u)
-    cnt[1] += 1
-    @assert S.varlist[cnt[1]] == typeof(u)
-    push!(data[cnt[1]],u)
     return data
 end
