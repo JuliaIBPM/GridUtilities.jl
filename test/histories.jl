@@ -74,10 +74,8 @@ end
   u = ones(5,5)
   t = 0.0
 
-  tmin_store = 0.0
-  tmax_store = 1000.0
   tsample = 0.05
-  S = StorePlan(tmin_store,tmax_store,tsample,"state" => u, "time" => t)
+  S = StorePlan(tsample,"state" => u, "time" => t)
 
   data_history = initialize_storage(S)
 
