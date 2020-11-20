@@ -2,7 +2,7 @@ name = "GridUtilities"
 uuid = "5c019650-0847-4ff6-8f91-f8ecfc8c3009"
 authors = ["Jeff Eldredge <jdeldre@g.ucla.edu>"]
 repo = "https://github.com/JuliaIBPM/GridUtilities.jl.git"
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 Interpolations = "a98d9a8b-a2ab-59e6-89dd-64a1c18fca59"
@@ -14,7 +14,7 @@ Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 [compat]
 Interpolations = "0.12.10"
 JLD = "0.10"
-Reexport = "^0"
+Reexport = "0.2.0"
 julia = "1"
 
 [extras]
