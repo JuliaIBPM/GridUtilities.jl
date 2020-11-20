@@ -90,7 +90,7 @@ end
 #=
  mean
 =#
-function mean!(h̄::T,h::History{T}) where {T}
+function mean!(h̄::T,h::History{T}) where {T<:AbstractArray}
     fill!(h̄,0.0)
     for hi in h
         h̄ .+= hi
@@ -99,7 +99,8 @@ function mean!(h̄::T,h::History{T}) where {T}
     return h̄
 end
 
-mean(h::History{T}) where {T} = mean!(T(),h)
+mean(h::History{T}) where {T<:AbstractArray} = mean!(T(),h)
+
 
 #=
 diff

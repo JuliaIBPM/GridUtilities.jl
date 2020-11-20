@@ -1,10 +1,14 @@
 using CartesianGrids
+using Statistics
 
 @testset "Histories" begin
 
   a = 1.0
   b = 0.0
   c = 5.0
+
+  h = History(collect(1:5))
+  @test mean(h) == 3
 
   h = History(Nodes(Dual,(5,5)))
   d = Nodes(Dual,(5,5))
@@ -94,5 +98,33 @@ end
   @test data_history["state"][2] == 2*u
   @test data_history["time"][2] == 2*t
 
+
+end
+
+@testset "Interpolations" begin
+
+  u0 = ones(5,5)
+  xg, yg = 0:1:4, 0:1:4
+  t = 0.0
+  u = deepcopy(u0)
+
+  t_sample = 0.05
+
+  S = StorePlan(t_sample,"state" => u0, "time" => t)
+
+  data_history = initialize_storage(S)
+
+  store_data!(data_history,t,S,"state"=>deepcopy(u),"time"=>t)
+
+  for i in 1:100
+    u .+= u0 # simple model, just for making it dynamic
+    t += 0.01
+    store_data!(data_history,t,S,"state"=>u,"time"=>t)
+  end
+  tr = data_history["time"][1]:t_sample:data_history["time"][end]
+
+  ui = interpolated_history(data_history["state"],xg,yg,tr)
+
+  @test ui(0.5,0.4,0.54) ≈ 55.0
 
 end
