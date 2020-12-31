@@ -2,9 +2,9 @@
 
 _Utility functions for discrete fields defined on grids_
 
-| Documentation | Build Status |
-|:---:|:---:|
-| [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://JuliaIBPM.github.io/GridUtilities.jl/stable) [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://JuliaIBPM.github.io/GridUtilities.jl/dev) | [![Build Status](https://github.com/JuliaIBPM/GridUtilities.jl/workflows/CI/badge.svg)](https://github.com/JuliaIBPM/GridUtilities.jl/actions) [![Coverage](https://codecov.io/gh/JuliaIBPM/GridUtilities.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaIBPM/GridUtilities.jl) |
+| Build Status |
+|:---:|
+| [![Build Status](https://github.com/JuliaIBPM/GridUtilities.jl/workflows/CI/badge.svg)](https://github.com/JuliaIBPM/GridUtilities.jl/actions) [![Coverage](https://codecov.io/gh/JuliaIBPM/GridUtilities.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/JuliaIBPM/GridUtilities.jl) |
 
 ## About the package
 
